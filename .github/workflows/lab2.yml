@@ -45,7 +45,7 @@ jobs:
 
       # 6. Trivy scan
       - name: Run Trivy scan
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: ghcr.io/${{ env.OWNER_LC }}/ecommerce-app:latest
           format: table
