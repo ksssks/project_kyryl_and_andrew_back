@@ -14,6 +14,7 @@ const startServer = async () => {
   try {
     await connectDB()
     await connectCloudinary()
+    logger.info("Cloudinary connected");
 
     await new Promise((resolve, reject) => {
       exec("npx migrate-mongo up", (err) => {

@@ -1,3 +1,4 @@
+import logger from "../config/logger.js";
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
 import Stripe from 'stripe'
@@ -31,7 +32,7 @@ const placeOrder = async (req, res) => {
         res.json({ success: true, message: "Order placed" })
 
     } catch (error) {
-        console.log(error);
+        logger.error({ message: error.message, error });
         res.json({ success: false, message: error.message })
     }
 
@@ -89,7 +90,7 @@ const placeOrderStripe = async (req, res) => {
         res.json({ success: true, session_url: session.url })
 
     } catch (error) {
-        console.log(error);
+        logger.error({ message: error.message, error });
         res.json({ success: false, message: error.message })
     }
 
@@ -111,7 +112,7 @@ const verifyStripe = async (req, res) => {
         }
 
     } catch (error) {
-        console.log(error);
+        logger.error({ message: error.message, error });
         res.json({ success: false, message: error.message })
     }
 
@@ -125,7 +126,7 @@ const allOrders = async (req, res) => {
         res.json({ success: true, orders })
 
     } catch (error) {
-        console.log(error);
+        logger.error({ message: error.message, error });
         res.json({ success: false, message: error.message })
     }
 
@@ -140,7 +141,7 @@ const userOrders = async (req, res) => {
         res.json({ success: true, orders })
 
     } catch (error) {
-        console.log(error);
+        logger.error({ message: error.message, error });
         res.json({ success: false, message: error.message })
     }
 }
@@ -153,7 +154,8 @@ const updateStatus = async (req, res) => {
         res.json({ success: true, message: 'Status updated' })
 
     } catch (error) {
-
+        logger.error({ message: error.message, error });
+        res.json({ success: false, message: error.message })
     }
 }
 

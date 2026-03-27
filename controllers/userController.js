@@ -2,6 +2,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userModel.js";
+import logger from "../config/logger.js";
 
 const createToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET)
@@ -31,7 +32,7 @@ const loginUser = async (req, res) => {
 
     } catch (error) {
         if (process.env.NODE_ENV !== "test") {
-            console.log(error)
+            logger.error({ message: error.message, error });
         }
         res.json({ success: false, message: error.message })
     }
@@ -73,7 +74,7 @@ const registerUser = async (req, res) => {
 
     } catch (error) {
         if (process.env.NODE_ENV !== "test") {
-            console.log(error)
+            logger.error({ message: error.message, error });
         }
         res.json({ success: false, message: error.message })
     }
@@ -93,7 +94,7 @@ const adminLogin = async (req, res) => {
 
     } catch (error) {
         if (process.env.NODE_ENV !== "test") {
-            console.log(error)
+            logger.error({ message: error.message, error });
         }
         res.json({ success: false, message: error.message })
     }

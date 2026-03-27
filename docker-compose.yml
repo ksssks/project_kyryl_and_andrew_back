@@ -1,0 +1,30 @@
+services:
+  db:
+    image: mongo:7.0
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: mydb
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  app:
+    build: .
+    container_name: app
+    ports:
+      - "4000:4000"
+    environment:
+      MONGODB_URI: "mongodb://root:example@db:27017/mydb?authSource=admin"
+      PORT: 4000
+      STRIPE_SECRET_KEY: sk_test_123456789
+    depends_on:
+      db:
+        condition: service_healthy

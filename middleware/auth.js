@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import logger from '../config/logger.js';
 
 const authUser = async (req, res, next) => {
 
@@ -16,7 +17,7 @@ const authUser = async (req, res, next) => {
 
     } catch (error) {
         if (process.env.NODE_ENV !== "test") {
-            console.log(error)
+            logger.error({ message: error.message, error });
         }
         res.json({ success: false, message: error.message })
     }
