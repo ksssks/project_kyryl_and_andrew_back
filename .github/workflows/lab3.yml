@@ -3,7 +3,7 @@ name: Lab 3 - Kubernetes CI
 on:
   push:
     branches:
-      - "**"   # Тепер спрацьовує на будь-яку гілку
+      - main
   pull_request:
 
 jobs:
@@ -18,54 +18,61 @@ jobs:
       # Install kubectl
       - name: Set up kubectl
         uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.27.3'
+
+      # Install KinD
+      - name: Install KinD
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
 
       # Create KinD cluster
       - name: Create KinD cluster
-        uses: helm/kind-action@v1
-        with:
-          cluster_name: ecommerce-cluster
- 
-      # Verify cluster
+        run: |
+          kind create cluster --name lab3 --wait 60s
+
+      # Check cluster info
       - name: Check cluster
         run: kubectl cluster-info
 
-      # Load Docker images into KinD
-      - name: Build and load app image into KinD
+      # Load app image into KinD
+      - name: Load app image into KinD
         run: |
-          docker build -t ecommerce-app:latest .
-          kind load docker-image ecommerce-app:latest --name ecommerce-cluster
+          docker pull ghcr.io/ksssks/ecommerce-app:latest
+          kind load docker-image ghcr.io/ksssks/ecommerce-app:latest --name lab3
 
-      # Apply ConfigMap and Secret
-      - name: Apply ConfigMap and Secret
+      # Create namespace first
+      - name: Create namespace
+        run: kubectl apply -f k8s/namespace.yaml
+
+      # Apply Kubernetes manifests
+      - name: Apply ConfigMap, Secret, MongoDB, and App manifests
         run: |
           kubectl apply -f k8s/configmap.yaml
           kubectl apply -f k8s/secret.yaml
-
-      # Deploy MongoDB
-      - name: Deploy MongoDB
-        run: |
           kubectl apply -f k8s/deployment-mongo.yaml
           kubectl apply -f k8s/service-mongo.yaml
-          kubectl wait --for=condition=ready pod -l app=mongo --timeout=120s
-
-      # Deploy App
-      - name: Deploy App
-        run: |
           kubectl apply -f k8s/deployment-app.yaml
           kubectl apply -f k8s/service-app.yaml
-          kubectl wait --for=condition=ready pod -l app=ecommerce --timeout=120s
+
+      # Wait for all pods to be ready
+      - name: Wait for pods
+        run: kubectl wait --for=condition=Ready pods --all --namespace=ecommerce --timeout=180s
 
       # Debug pods
       - name: Debug pods
         run: |
           echo "### Pods ###"
-          kubectl get pods
+          kubectl get pods -n ecommerce
           echo "### Pod Description ###"
-          kubectl describe pods
+          kubectl describe pods -n ecommerce
           echo "### Pod Logs ###"
-          kubectl logs -l app=ecommerce --tail=50 || true
+          kubectl logs -n ecommerce -l app=ecommerce-app --tail=50 || true
+          kubectl logs -n ecommerce -l app=mongo --tail=50 || true
 
-      # 10. Run Lab 3 Master Validation Script
+      # Run Lab 3 Master Validation Script
       - name: Run Master Validation Script
         run: |
           chmod +x ./tests/lab3_test.sh
