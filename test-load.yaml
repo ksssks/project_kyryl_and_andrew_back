@@ -1,0 +1,102 @@
+config:
+  target: "http://localhost:4000" 
+  phases:
+    - duration: 60              
+      arrivalRate: 20           
+scenarios:
+  - name: "Register User"     
+    flow:
+      - post:
+          url: "/api/user/register"
+          json:
+            name: "TestUser"
+            email: "testuser+{{__VU}}@example.com" 
+            password: "TestPassword123"
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "Login User"     
+    flow:
+      - post:
+          url: "/api/user/login"
+          json:
+            email: "testuser+{{__VU}}@example.com" 
+            password: "TestPassword123"
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "List Products"     
+    flow:
+      - get:
+          url: "/api/product/list"
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "Single Product"    
+    flow:
+      - post:
+          url: "/api/product/single"
+          json:
+            productID: "672db910f3c34d970d7bf66e" 
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "Get User Cart"
+    flow:
+      - post:
+          url: "/api/cart/get"
+          body: '{"userId": "672f69223506db5312ff5638"}' 
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "Add to Cart"
+    flow:
+      - post:
+          url: "/api/cart/add"
+          body: '{"userId": "672f69223506db5312ff5638", "itemId": "672db910f3c34d970d7bf66e", "size": "M"}' 
+    phases:
+      - duration: 60
+        arrivalRate: 10
+  - name: "Update Cart"
+    flow:
+      - post:
+          url: "/api/cart/update"
+          body: '{"userId": "672f69223506db5312ff5638", "itemId": "672db910f3c34d970d7bf66e", "size": "M", "quantity": 3}' 
+    phases:
+      - duration: 60
+        arrivalRate: 10
+
+
+  - name: "Combined Test"
+    flow:
+      - get:
+          url: "/"
+      - post:
+          url: "/api/user/register"
+          json:
+            name: "TestUser"
+            email: "testuser+{{__VU}}@example.com"
+            password: "TestPassword123"
+      - post:
+          url: "/api/user/login"
+          json:
+            email: "testuser+{{__VU}}@example.com"
+            password: "TestPassword123"
+      - get:
+          url: "/api/product/list"
+      - post:
+          url: "/api/product/single"
+          json:
+            productID: "672db910f3c34d970d7bf66e"
+      - post:
+          url: "/api/cart/get"
+          body: '{"userId": "672f69223506db5312ff5638"}'
+      - post:
+          url: "/api/cart/add"
+          body: '{"userId": "672f69223506db5312ff5638", "itemId": "672db910f3c34d970d7bf66e", "size": "M"}'
+      - post:
+          url: "/api/cart/update"
+          body: '{"userId": "672f69223506db5312ff5638", "itemId": "672db910f3c34d970d7bf66e", "size": "M", "quantity": 3}'
+    phases:
+      - duration: 60
+        arrivalRate: 20

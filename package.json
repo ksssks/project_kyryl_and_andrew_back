@@ -1,0 +1,41 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "test": "jest",
+    "migrate": "migrate-mongo up",
+    "migrate:down": "migrate-mongo down"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "artillery": "^2.0.21",
+    "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
+    "migrate-mongo": "^14.0.7",
+    "mongoose": "^8.8.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.7",
+    "pino": "^10.3.1",
+    "stripe": "^17.3.0",
+    "validator": "^13.12.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.2",
+    "node-mocks-http": "^1.16.2",
+    "supertest": "^7.0.0"
+  }
+}
