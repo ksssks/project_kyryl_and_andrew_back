@@ -13,7 +13,7 @@ jobs:
       KUBECONFIG: ${{ runner.temp }}/kubeconfig
 
     steps:
-      # 1. Checkout code
+      # 1. Checkout  code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
