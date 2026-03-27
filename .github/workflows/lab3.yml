@@ -1,0 +1,36 @@
+name: Lab 3 Kubernetes CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  k8s-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # Install kubectl
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+
+      # Install KinD
+      - name: Setup KinD
+        uses: helm/kind-action@v1
+
+      # Apply manifests
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/
+
+      # Wait a bit for pods
+      - name: Wait for pods
+        run: sleep 20
+
+      # Run grading script
+      - name: Run Lab 3 tests
+        run: |
+          chmod +x ./tests/lab3_test.sh
+          ./tests/lab3_test.sh
