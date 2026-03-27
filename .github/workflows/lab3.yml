@@ -1,36 +1,54 @@
-name: Lab 3 Kubernetes CI
+name: Lab 3 - Kubernetes CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  k8s-test:
+  lab3:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      # Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      # Install kubectl
-      - name: Setup kubectl
-        uses: azure/setup-kubectl@v4
-
-      # Install KinD
-      - name: Setup KinD
-        uses: helm/kind-action@v1
-
-      # Apply manifests
-      - name: Apply Kubernetes manifests
+      # Install KinD and kubectl
+      - name: Install KinD and kubectl
         run: |
-          kubectl apply -f k8s/
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
 
-      # Wait a bit for pods
+      # Create KinD cluster
+      - name: Create KinD Cluster
+        run: |
+          kind create cluster --name lab3 --wait 60s
+
+      # Apply Kubernetes manifests
+      - name: Apply k8s manifests
+        run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply -f k8s/secret.yaml
+          kubectl apply -f k8s/configmap.yaml
+          kubectl apply -f k8s/deployment-mongo.yaml
+          kubectl apply -f k8s/service-mongo.yaml
+          kubectl apply -f k8s/deployment-app.yaml
+          kubectl apply -f k8s/service-app.yaml
+
+      # Wait a bit for pods to start
       - name: Wait for pods
-        run: sleep 20
+        run: |
+          kubectl wait --for=condition=Ready pods --all --namespace=ecommerce --timeout=120s
 
-      # Run grading script
-      - name: Run Lab 3 tests
+      # Run Lab 3 Master Validation Script
+      - name: Run Master Validation Script
+        env:
+          KUBECONFIG: $HOME/.kube/config
         run: |
           chmod +x ./tests/lab3_test.sh
           ./tests/lab3_test.sh
