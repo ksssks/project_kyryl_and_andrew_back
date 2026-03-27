@@ -9,12 +9,14 @@ on:
 jobs:
   lab3:
     runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: $HOME/.kube/config
     steps:
-      # Checkout code
+      # 1. Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Install KinD and kubectl
+      # 2. Install KinD and kubectl
       - name: Install KinD and kubectl
         run: |
           curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
@@ -24,12 +26,14 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      # Create KinD cluster
+      # 3. Create KinD cluster
       - name: Create KinD Cluster
         run: |
-          kind create cluster --name lab3 --wait 60s
+          kind create cluster --name lab3 --wait 120s
+          # Ensure kubeconfig points to the new cluster
+          kind get kubeconfig --name lab3 > $HOME/.kube/config
 
-      # Apply Kubernetes manifests
+      # 4. Apply Kubernetes manifests
       - name: Apply k8s manifests
         run: |
           kubectl apply -f k8s/namespace.yaml
@@ -40,15 +44,14 @@ jobs:
           kubectl apply -f k8s/deployment-app.yaml
           kubectl apply -f k8s/service-app.yaml
 
-      # Wait a bit for pods to start
+      # 5. Wait for pods to be ready
       - name: Wait for pods
         run: |
-          kubectl wait --for=condition=Ready pods --all --namespace=ecommerce --timeout=120s
+          # Wait for all pods in the namespace to be ready
+          kubectl wait --for=condition=Ready pods --all --namespace=ecommerce --timeout=180s
 
-      # Run Lab 3 Master Validation Script
+      # 6. Run Lab 3 Master Validation Script
       - name: Run Master Validation Script
-        env:
-          KUBECONFIG: $HOME/.kube/config
         run: |
           chmod +x ./tests/lab3_test.sh
           ./tests/lab3_test.sh
