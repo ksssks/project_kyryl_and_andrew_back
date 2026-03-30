@@ -26,8 +26,17 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
 
+      - name: Apply ConfigMap
+        run: kubectl apply -f k8s/mongo-configmap.yaml
+
+      - name: Apply Secret
+        run: kubectl apply -f k8s/secret.yaml
+
       - name: Apply manifests
         run: kubectl apply -f k8s/
+
+      - name: Wait for ecommerce-app to be ready
+        run: kubectl wait --for=condition=available deployment/ecommerce-app --timeout=90s
 
       - name: Run tests
         run: bash tests/lab3_test.sh
