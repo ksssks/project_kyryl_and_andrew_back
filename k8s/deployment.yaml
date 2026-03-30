@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ecommerce-app
+  name: ecommerce-app-deployment
   labels:
     app: ecommerce-app
 spec:
@@ -19,28 +19,17 @@ spec:
           image: ahgpeu6po/ecommerce-app:latest
           ports:
             - containerPort: 4000
-          
+
+          envFrom:
+            - secretRef:
+                name: mongo-secret
+
           env:
-          - name: USER_NAME
-            valueFrom:
-              secretKeyRef:
-                name: mongo-secret
-                key: DB_USER
-          - name: USER_PWD
-            valueFrom:
-              secretKeyRef:
-                name: mongo-secret
-                key: DB_PASSWORD
-          - name: MONGODB_URI
-            valueFrom:
-              configMapKeyRef:
-                name: mongo-config
-                key: mongo-url
-          - name: STRIPE_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                name: mongo-secret
-                key: STRIPE_SECRET_KEY
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-config
+                  key: mongo-url
 
           livenessProbe:
             httpGet:
