@@ -23,13 +23,8 @@ spec:
           envFrom:
             - secretRef:
                 name: mongo-secret
-
-          env:
-            - name: DB_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: mongo-config
-                  key: mongo-url
+            - configMapRef:
+                name: mongo-config
 
           livenessProbe:
             httpGet:

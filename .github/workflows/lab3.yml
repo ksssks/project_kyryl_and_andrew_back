@@ -26,21 +26,8 @@ jobs:
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
 
-      - name: Create secrets
-        run: |
-          kubectl create secret generic mongo-secret \
-            --from-literal=DB_USER=mongo-user \
-            --from-literal=DB_PASSWORD=mongo-password \
-            --from-literal=STRIPE_SECRET_KEY=stripe_key
-
-      - name: Create configmap
-        run: kubectl create configmap mongo-config --from-literal=mongo-url=mongo-service
-
       - name: Apply manifests
         run: kubectl apply -f k8s/
-
-      - name: Wait for ecommerce-app deployment
-        run: kubectl rollout status deployment/ecommerce-app --timeout=90s
 
       - name: Run tests
         run: bash tests/lab3_test.sh
