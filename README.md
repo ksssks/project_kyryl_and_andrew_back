@@ -54,14 +54,24 @@ Provided the application is running normally and the database connection is acti
 ### Database Failure (Status 503)
 In the event of a manual database shutdown, the application correctly intercepts the state change and signals that the service is unavailable. The following screenshot demonstrates the request result after disconnecting the DB:
 
-![Database Failure (Status 503)](./img_rdm/img_1.png)
+![Database Failure (Status 503)](./img_rdm/img_3.png)
 
 ---
 ## Quick Start: One-Command Build
 
 To simplify the deployment process and eliminate the need for manual environment configuration, this project supports a seamless initialization process. You can spin up the entire infrastructure, including the application server and the database, using a single command.
 
-![Quick Start: One-Command Build](./img_rdm/img_2.png)
+![Quick Start: One-Command Build](./img_rdm/img_4.png)
+
+---
+
+## Gracefull shutdown
+![Gracefull shutdown](./img_rdm/img_1.png)
+
+---
+
+## 1 command test
+![1 command test](./img_rdm/img_2.png)
 
 ---
 
